@@ -1,0 +1,12 @@
+.groupButton {
+    display: flex;
+    flex-direction: column;
+}
+
+.class .ant-card-body{
+    padding: 0 !important;
+}
+
+.detail-box{
+    margin-right: 15px;
+}

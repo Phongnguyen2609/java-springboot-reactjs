@@ -1,0 +1,125 @@
+import React, { useState, useEffect } from "react";
+import "./register.css";
+import { DatePicker, Input } from 'antd';
+import { Card, Table, Space, Tag, PageHeader, Divider, Form, Button, notification } from 'antd';
+import { UserOutlined, LockOutlined, PhoneOutlined, MailOutlined, AimOutlined, MoneyCollectOutlined } from '@ant-design/icons';
+import { useHistory } from "react-router-dom";
+import axiosClient from "../../apis/axiosClient";
+
+const { Search } = Input;
+
+const RegisterCustomer = () => {
+
+    const [delivery, setDelivery] = useState([]);
+    let history = useHistory();
+
+    const onFinish = async (values) => {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = today.getFullYear();
+        var date = yyyy + "-" + mm + "-" + dd;
+
+        try {
+            const formatData = {
+                "username": values.username,
+                "password": values.password,
+            }
+            await axiosClient.post("/auth/register", formatData)
+                .then(response => {
+                    console.log(response);
+                    if (response === "Email is exist") {
+                        return notification["error"]({
+                            message: "Thông báo",
+                            description: "Email đã tồn tại",
+
+                        });
+                    }
+                    if (response === undefined) {
+                        notification["error"]({
+                            message: "Thông báo",
+                            description: "Đăng ký thất bại",
+
+                        });
+                    }
+                    else {
+                        notification["success"]({
+                            message: "Thông báo",
+                            description: "Đăng kí thành công",
+                        });
+                        setTimeout(function () {
+                            history.push("/login");
+                        }, 1000);
+                    }
+                }
+                );
+        } catch (error) {
+            throw error;
+        }
+    }
+    return (
+        <div>
+            <div className="imageBackground">
+                <div id="wrapper">
+                    <Card id="dialog" bordered={false} >
+                        <Form
+                            style={{ width: 370, marginBottom: 8 }}
+                            name="normal_login"
+                            className="loginform"
+                            initialValues={{
+                                remember: true,
+                            }}
+                            onFinish={onFinish}
+                        >
+                            <Form.Item style={{ marginBottom: 3 }}>
+
+                                <Divider style={{ marginBottom: 5, fontSize: 19 }} orientation="center">QLSV!</Divider>
+                            </Form.Item>
+                            <Form.Item style={{ marginBottom: 16 }}>
+                                <p className="text">Đăng Kí Tài Khoản</p>
+                            </Form.Item>
+
+                            <Form.Item
+                                style={{ marginBottom: 20 }}
+                                name="username"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng nhập tài khoản!',
+                                    },
+                                ]}
+                            >
+                                <Input prefix={<UserOutlined className="siteformitemicon" />} placeholder="Tài khoản" />
+                            </Form.Item >
+
+                            <Form.Item
+                                style={{ marginBottom: 20 }}
+                                name="password"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: 'Vui lòng nhập mật khẩu!',
+                                    },
+                                ]}
+                            >
+                                <Input
+                                    prefix={<LockOutlined className="siteformitemicon" />}
+                                    type="password"
+                                    placeholder="Mật khẩu"
+                                />
+                            </Form.Item>
+
+                            <Form.Item style={{ marginBottom: 18 }}>
+                                <Button className="loginformbutton" type="primary" htmlType="submit"  >
+                                    Đăng Kí
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                    </Card>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+export default RegisterCustomer;
